@@ -5,31 +5,38 @@
 
 <body>
     <h1>Game Characters</h1>
+    
+    <p id="data">Game Characters</p>  
     <button id="fetchButton">Fetch Game Characters</button>
 
     <script>
-        console.log('this is my script for the page');
+        /*console.log('this is my script for the page');
         document.querySelector('#fetchButton').addEventListener('click', function(evt) {
         console.log('you clicked the button');
+        */
 
         // POST request
+        async function fetchGameCharacters() {
+            const response = await fetch('http://localhost:8080/characters');
+            const data = await response.json();
+            console.log(data);
+        };
+
         const element = document.querySelector('#data');
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title: 'POST Game Characters Request' })
         };
-
-        async function fetchGameCharacters() {
-            const response = await fetch('http://localhost:8080/charecters');
-            const data = await response.json();
-            console.log(data);
-        };
         
-        fetch('http://localhost:8080/charecters', requestOptions)
+        fetch('http://localhost:8080/characters', requestOptions)
             .then(response => response.json())
             .then(data => element.innerHTML = data.id);
-        });
+
+        const fetchButton = document.querySelector('#fetchButton');
+        fetchButton.addEventListener('click', fetchGameCharacters);
+        
+        fetchGameCharacters();
 
     </script>
 </body>
