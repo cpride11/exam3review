@@ -1,28 +1,36 @@
 <html>
-    <head>
-        <title>My other types of http requests</title>
-    </head>
-    <body>
-        <p id="data">Something will come here</p>
-        <button id="fetchButton">Run fetch</button>
-    </body>
+<head>
+    <title>Game Characters API</title>
+</head>
+
+<body>
+    <h1>Game Characters</h1>
+    <button id="fetchButton">Fetch Game Characters</button>
+
     <script>
         console.log('this is my script for the page');
         document.querySelector('#fetchButton').addEventListener('click', function(evt) {
-            console.log('you clicked the button');
-            // I would like to create a request to 
-            // 'POST http://localhost:808/student/123'
+        console.log('you clicked the button');
 
-            const element = document.querySelector('#data');
-            const requestOptions = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                // body: JSON.stringify(({ title: 'Fetch POST Request Example' }))
-            };
-            fetch('http://localhost:8080/studennt/123', requestOptions)
-                .then(response => response.json())
-                .then(data => element.innerHTML = data.id);
+        // POST request
+        const element = document.querySelector('#data');
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: 'POST Game Characters Request' })
+        };
+
+        async function fetchGameCharacters() {
+            const response = await fetch('http://localhost:8080/charecters');
+            const data = await response.json();
+            console.log(data);
+        };
+        
+        fetch('http://localhost:8080/charecters', requestOptions)
+            .then(response => response.json())
+            .then(data => element.innerHTML = data.id);
         });
 
     </script>
+</body>
 </html>
