@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient, ObjectID } = require('mongodb');
+const path = require('path');
 
 const myapp = express();
 const PORT = process.env.PORT || 8080;
@@ -10,18 +11,21 @@ myapp.use(bodyParser.json());
 
 let db;
 
-MongoClient.connect(MONGO_URL, { useUnifiedTopology: true }, (err, client) => {
+MongoClient.connect(MONGO_URL, 
+    { useUnifiedTopology: true }, (err, client) => {
     if (err) {
         console.error('Failed to connect to MongoDB:', err);
         return;
     }
     console.log('Connected to MongoDB');
-    db = client.db('game_characters'); // Change 'game_characters' to your database name
+    db = client.db('game-chars-database'); // mongodb database name
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
 });
 
+// Serve static files from the 'public' directory
+myapp.use(express.static(path.join(__dirname, 'public')));
 
 // Game character data
 let characters = [
@@ -29,13 +33,6 @@ let characters = [
     { id: 2, name: 'Link', game: 'The Legend of Zelda' },
     { id: 3, name: 'Kratos', game: 'God of War' },
 ];
-
-/*// Get request 
-myapp.get(['/', '/index.html'], (req, res) => {
-    console.log('req for root, sending file ${__dirname}/public/index.html');
-    res.sendFile('${__dirname}/public/index.html'); 
-});
-*/
 
 // Get request to fetch all characters
 myapp.get('/characters', async (req, res) => {
