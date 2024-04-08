@@ -1,9 +1,27 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { MongoClient, ObjectID } = require('mongodb');
 
 const myapp = express();
+const PORT = process.env.PORT || 8080;
+const MONGO_URL = 'mongodb+srv://cpride829:<password>@snowcatcluster.pnatmvc.mongodb.net/';
 
 myapp.use(bodyParser.json());
+
+let db;
+
+MongoClient.connect(MONGO_URL, { useUnifiedTopology: true }, (err, client) => {
+    if (err) {
+        console.error('Failed to connect to MongoDB:', err);
+        return;
+    }
+    console.log('Connected to MongoDB');
+    db = client.db('game_characters'); // Change 'game_characters' to your database name
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+});
+
 
 // Game character data
 let characters = [
@@ -12,72 +30,91 @@ let characters = [
     { id: 3, name: 'Kratos', game: 'God of War' },
 ];
 
-/*
-// GET request to fetch all characters
-myapp.get('/characters', (req, res) => {
-    res.json(characters);
-});
-*/
-
-// Get request
+/*// Get request 
 myapp.get(['/', '/index.html'], (req, res) => {
     console.log('req for root, sending file ${__dirname}/public/index.html');
     res.sendFile('${__dirname}/public/index.html'); 
 });
+*/
 
-myapp.get('/characters', (req, res) => {
-    res.status(200).send(characters);
-    res.end();
-});
-
-myapp.get('/character/:id', (req, res) => {
-    const givenID = req.params.id;  
-    const character = characters.find(char => char.id === parseInt(givenID));
-
-    if (!character) {
-        res.status(404).send('Character not found');
-    } else {
-        res.status(200).send(character);
+// Get request to fetch all characters
+myapp.get('/characters', async (req, res) => {
+    try{ 
+        const characters = await db.collection('characters').find().toArray();
+        res.status(200).send(characters);
+    } catch (err) {
+        console.error('Error getting characters:', err);
+        res.status(500).send('Error getting characters');
     }
     res.end();
 });
 
-// Post request
-myapp.post('/characters', (req, res) => {
-    const { name, game } = req.body;
-    const id = characters.length + 1;
-
-    characters.push({ id, name, game });
-    res.status(201).send({ id, name, game });
-    res.end();
-});
-
-// Put request
-myapp.put('/characters/:id', (req, res) => {
-    const givenID = req.params.id;
-    const { name, game } = req.body;
-    const character = characters.update(char => char.id === parseInt(givenID));
-
-    if (!character) {
-        res.status(404).send('Character not found');
-    } else {
-        character.name = name;
-        character.game = game;
-        res.status(200).send(character);
+// Get request to fetch a single character
+myapp.get('/character/:id', async (req, res) => {
+    try {
+        const character = await db.collection('characters').findOne({ _id: ObjectID(req.params.id) });
+        if (!character) {
+            res.status(404).send('Character not found');
+        } else {
+            res.status(200).send(character);
+        }
+    }
+    catch (err) {
+        console.error('Error getting character:', err);
+        res.status(500).send('Error getting character');
     }
     res.end();
 });
 
-// Delete request
+// Post request to add a new character
+myapp.post('/characters', async (req, res) => {
+    try {
+    const { name, game } = req.body;
+    const result = db.collection('characters').insertOne({ name, game });
+    const newCharacter = await db.collection('characters').findOne({ _id: result.insertedId });
+    res.status(201).send(newCharacter);
+    } catch (err) {
+        console.error('Error adding character:', err);
+        res.status(500).send('Error adding character');
+    }
+    res.end();
+});
+
+// Put request to update a character
+myapp.put('/characters/:id', async (req, res) => {
+    try {
+        const { name, game } = req.body;
+        const result = db.collection('characters').updateOne(
+            { _id: ObjectID(req.params.id) }, 
+            { $set: { name, game } 
+        });
+        if (result.modifiedCount === 0) {
+            res.status(404).send('Character not found');
+        } else {
+            const updatedCharacter = await db.collection('characters').findOne({ _id: ObjectID(req.params.id) });
+            res.status(200).send(updatedCharacter);
+        }
+    } catch (err) {
+        console.error('Error updating character:', err);
+        res.status(500).send('Error updating character');   
+    }
+    res.end();
+});
+
+// Delete request to remove a character
 myapp.delete('/characters/:id', (req, res) => {
-    const givenID = req.params.id;
-    const character = characters.deleteOne(char => char.id === parseInt(givenID));
-
-    if (!character) {
-        res.status(404).send('Character not found');
-    } else {
-        characters = characters.filter(char => char.id !== parseInt(givenID));
-        res.status(200).send('Character deleted');
+    try {
+        const result = db.collection('characters').deleteOne(
+            { _id: ObjectID(req.params.id) });
+        if (result.deletedCount === 0) {
+            res.status(404).send('Character not found');
+        } else {
+            res.status(200).send('Character deleted');
+        }
+    }
+    catch (err) {
+        console.error('Error deleting character:', err);
+        res.status(500).send('Error deleting character');
     }
     res.end();
 });
