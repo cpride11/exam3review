@@ -9,11 +9,52 @@
     <p id="data">Game Characters</p>  
     <button id="fetchButton">Fetch Game Characters</button>
 
+    <h2>All Characters</h2>
+    <table id="charactersTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Game</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Characters will be dynamically inserted here -->
+        </tbody>
+    </table>
+
     <script>
+        // Function to fetch and display characters
+        async function fetchCharacters() {
+            const response = await fetch('/characters');
+            const characters = await response.json();
+
+            const charactersTable = document.getElementById('charactersTable');
+            const tbody = charactersTable.querySelector('tbody');
+
+            tbody.innerHTML = '';
+            characters.forEach(character => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${character.id}</td>
+                    <td>${character.name}</td>
+                    <td>${character.game}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Event listener for fetch button
+        const fetchButton = document.getElementById('fetchButton');
+        fetchButton.addEventListener('click', fetchCharacters);
+
+        // Initially fetch characters when the page loads
+        fetchCharacters();
+
         /*console.log('this is my script for the page');
         document.querySelector('#fetchButton').addEventListener('click', function(evt) {
         console.log('you clicked the button');
-        */
+        
 
         // POST request
         async function fetchGameCharacters() {
@@ -37,6 +78,7 @@
         fetchButton.addEventListener('click', fetchGameCharacters);
         
         fetchGameCharacters();
+        */
 
     </script>
 </body>

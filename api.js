@@ -12,6 +12,13 @@ let characters = [
     { id: 3, name: 'Kratos', game: 'God of War' },
 ];
 
+/*
+// GET request to fetch all characters
+myapp.get('/characters', (req, res) => {
+    res.json(characters);
+});
+*/
+
 // Get request
 myapp.get(['/', '/index.html'], (req, res) => {
     console.log('req for root, sending file ${__dirname}/public/index.html');
@@ -23,7 +30,7 @@ myapp.get('/characters', (req, res) => {
     res.end();
 });
 
-myapp.get('/characters/:id', (req, res) => {
+myapp.get('/character/:id', (req, res) => {
     const givenID = req.params.id;  
     const character = characters.find(char => char.id === parseInt(givenID));
 
@@ -49,7 +56,7 @@ myapp.post('/characters', (req, res) => {
 myapp.put('/characters/:id', (req, res) => {
     const givenID = req.params.id;
     const { name, game } = req.body;
-    const character = characters.find(char => char.id === parseInt(givenID));
+    const character = characters.update(char => char.id === parseInt(givenID));
 
     if (!character) {
         res.status(404).send('Character not found');
@@ -64,7 +71,7 @@ myapp.put('/characters/:id', (req, res) => {
 // Delete request
 myapp.delete('/characters/:id', (req, res) => {
     const givenID = req.params.id;
-    const character = characters.find(char => char.id === parseInt(givenID));
+    const character = characters.deleteOne(char => char.id === parseInt(givenID));
 
     if (!character) {
         res.status(404).send('Character not found');
