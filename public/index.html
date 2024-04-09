@@ -1,13 +1,27 @@
-<html>
 <head>
-    <title>Game Characters API</title>
+    <title>Game Character API</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
-
 <body>
-    <h1>Game Characters</h1>
+    <h1>Game Character API</h1>
     
-    <p id="data">Game Characters</p>  
-    <button id="fetchButton">Fetch Game Characters</button>
+    <button id="fetchButton">Fetch Characters</button>
 
     <h2>All Characters</h2>
     <table id="charactersTable">
@@ -26,22 +40,30 @@
     <script>
         // Function to fetch and display characters
         async function fetchCharacters() {
-            const response = await fetch('/characters');
-            const characters = await response.json();
+            try {
+                const response = await fetch('http://localhost:3000/characters');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch characters');
+                }
+                const characters = await response.json();
 
-            const charactersTable = document.getElementById('charactersTable');
-            const tbody = charactersTable.querySelector('tbody');
+                const charactersTable = document.getElementById('charactersTable');
+                const tbody = charactersTable.querySelector('tbody');
 
-            tbody.innerHTML = '';
-            characters.forEach(character => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${character.id}</td>
-                    <td>${character.name}</td>
-                    <td>${character.game}</td>
-                `;
-                tbody.appendChild(row);
-            });
+                tbody.innerHTML = '';
+                characters.forEach(character => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${character.id}</td>
+                        <td>${character.name}</td>
+                        <td>${character.game}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error(error);
+                alert('Failed to fetch characters');
+            }
         }
 
         // Event listener for fetch button
@@ -50,36 +72,6 @@
 
         // Initially fetch characters when the page loads
         fetchCharacters();
-
-        /*console.log('this is my script for the page');
-        document.querySelector('#fetchButton').addEventListener('click', function(evt) {
-        console.log('you clicked the button');
-        
-
-        // POST request
-        async function fetchGameCharacters() {
-            const response = await fetch('http://localhost:8080/characters');
-            const data = await response.json();
-            console.log(data);
-        };
-
-        const element = document.querySelector('#data');
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: 'POST Game Characters Request' })
-        };
-        
-        fetch('http://localhost:8080/characters', requestOptions)
-            .then(response => response.json())
-            .then(data => element.innerHTML = data.id);
-
-        const fetchButton = document.querySelector('#fetchButton');
-        fetchButton.addEventListener('click', fetchGameCharacters);
-        
-        fetchGameCharacters();
-        */
-
     </script>
 </body>
 </html>

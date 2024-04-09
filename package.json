@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "mongodb": "^6.5.0"
+    "mongodb": "^6.5.0",
+    "node": "^18.20.1"
   },
   "name": "exam3review",
   "description": "",

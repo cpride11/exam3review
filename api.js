@@ -5,8 +5,14 @@ const path = require('path');
 
 const myapp = express();
 const PORT = process.env.PORT || 8080;
-const MONGO_URL = 'mongodb+srv://cpride829:<password>@snowcatcluster.pnatmvc.mongodb.net/';
 
+require('dotenv').config();
+
+// const mongoURI = 'mongodb://localhost:27017';
+
+const mongoURI = process.env.MONGODB_URI;
+const dbName = 'game-chars-database';
+const collectionName = 'game-chars-collection';
 myapp.use(bodyParser.json());
 
 let db;
@@ -29,9 +35,9 @@ myapp.use(express.static(path.join(__dirname, 'public')));
 
 // Game character data
 let characters = [
-    { id: 1, name: 'Luigi', game: 'Super Mario Bros' },
-    { id: 2, name: 'Link', game: 'The Legend of Zelda' },
-    { id: 3, name: 'Kratos', game: 'God of War' },
+    { id: 1, name: 'Sebastian Sallow', game: 'Hogwarts Legacy' },
+    { id: 2, name: 'Nathan Drake', game: 'Uncharted' },
+    { id: 3, name: 'Lara Croft', game: 'Tomb Raider' },
 ];
 
 // Get request to fetch all characters
@@ -116,4 +122,4 @@ myapp.delete('/characters/:id', (req, res) => {
     res.end();
 });
 
-myapp.listen(8080);
+myapp.listen(3000);
